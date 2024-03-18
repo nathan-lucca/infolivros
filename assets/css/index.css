@@ -1,0 +1,61 @@
+body {
+  background-color: #f9f5e1;
+}
+
+a {
+  text-decoration: none;
+  color: rgba(var(--bs-link-color-rgb), var(--bs-link-opacity, 1));
+}
+
+.fundo-container {
+  background-color: #556b2f;
+}
+
+.capa-livro {
+  height: 128px;
+}
+
+.titulo-livro {
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.zoomed {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s, visibility 0s linear 0.3s;
+}
+
+.zoomed-content {
+  max-width: 80%;
+  max-height: 80%;
+  overflow: auto;
+  scrollbar-width: none; /* Para o Firefox */
+}
+
+.zoomed-content img {
+  max-width: 100%;
+  max-height: 100%;
+}
+
+.zoomed-content .livro-texto {
+  color: #fff;
+}
+
+.zoomed-content::-webkit-scrollbar {
+  display: none; /* Para o Chrome e Safari */
+}
+
+.zoom-ativo {
+  overflow: hidden;
+}

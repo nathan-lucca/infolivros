@@ -96,6 +96,10 @@ function mostrarDetalhes(volumeInfo, imgCapa) {
     uk: "Ucraniano",
   };
 
+  const data = new Date(volumeInfo.publishedDate);
+  const dataFormatada =
+    data.getDate() + "/" + data.getMonth() + "/" + data.getFullYear();
+
   document.getElementById("desc-livro").textContent =
     volumeInfo.description || "Não informado";
   document.getElementById("autor-livro").innerHTML = `<b>Autor(es): </b>${
@@ -116,7 +120,7 @@ function mostrarDetalhes(volumeInfo, imgCapa) {
   document.getElementById(
     "ano-livro"
   ).innerHTML = `<b>Data de Publicação: </b>${
-    volumeInfo.publishedDate || "Não informado"
+    dataFormatada || "Não informado"
   }`;
   document.getElementById(
     "compra-livro"

@@ -1,59 +1,78 @@
-const apiKey = window.env.API_TOKEN;
+const apiKey = window.env.API_TOKEN; // Chave da API no config.js
 const sem_capa = "assets/img/SEM_CAPA.png";
-let startIndex = 0;
-let loading = false;
-let lastQuery = "Sherlock Holmes";
+let startIndex = 0; // Começando a busca em 0
+let loading = false; // Carregando livros
+let lastQuery = "Sherlock Holmes"; // Última busca do usuário
 
-function carregarLivros(startIndex, query) {
-  const maxResults = 40;
-  const url = `https://www.googleapis.com/books/v1/volumes?q=${query}&startIndex=${startIndex}&maxResults=${maxResults}&key=${apiKey}`;
+const pageSize = 15; // Total de livros por páginas
+let totalItems = 0; // Quantidade total de livros
+let totalPages = 0; // Número total de páginas
+let currentPage = 1; // Página tual
 
-  fetch(url)
-    .then((response) => {
-      if (!response.ok) {
-        throw new Error("Erro ao carregar os livros.");
-      }
+async function carregarLivros(startIndex, query) {
+  mostrarCarregando();
 
-      return response.json();
-    })
-    .then((data) => {
-      for (let i = 0; i < data.items.length; i++) {
-        const livro = data.items[i];
-        const imgCapa = livro.volumeInfo.imageLinks?.thumbnail || sem_capa;
+  try {
+    const maxResults = 15;
+    const url = `https://www.googleapis.com/books/v1/volumes?q=${query}&startIndex=${startIndex}&maxResults=${maxResults}&key=${apiKey}`;
 
-        const livroElement = document.createElement("div");
-        livroElement.classList.add(
-          "livro",
-          "col-md-4",
-          "text-center",
-          "border-bottom",
-          "p-2"
-        );
+    await new Promise(resolve => setTimeout(resolve, 2000));
 
-        const titulo = document.createElement("p");
-        titulo.textContent = livro.volumeInfo.title;
-        titulo.classList.add("text-light", "titulo-livro");
+    const response = await fetch(url);
+    if (!response.ok) {
+      throw new Error("Erro ao carregar os livros.");
+    }
 
-        const img = document.createElement("img");
-        img.src = imgCapa;
-        img.classList.add("capa-livro");
+    const data = await response.json();
+    esconderCarregando();
 
-        const botao = document.createElement("button");
-        botao.textContent = "Ver mais";
-        botao.classList.add("btn", "btn-primary", "btn-sm", "mt-3");
-        botao.addEventListener("click", () =>
-          mostrarDetalhes(livro.volumeInfo, imgCapa)
-        );
+    totalItems = data.totalItems; // Atualiza a quantidade total de livros
+    totalPages = Math.ceil(totalItems / pageSize); // Calcula o número total de páginas
+    document.getElementById("total-paginas").textContent = totalPages; // Atualiza o número total de páginas na página
 
-        livroElement.appendChild(titulo);
-        livroElement.appendChild(img);
-        livroElement.appendChild(document.createElement("br"));
-        livroElement.appendChild(botao);
+    for (let i = 0; i < data.items.length; i++) {
+      const livro = data.items[i];
+      const imgCapa = livro.volumeInfo.imageLinks?.thumbnail || sem_capa;
+      const livroElement = criarLivroElemento(livro, imgCapa);
 
-        document.getElementById("livros").appendChild(livroElement);
-      }
-    })
-    .catch((error) => console.error(error));
+      document.getElementById("livros").appendChild(livroElement);
+    }
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+function criarLivroElemento(livro, imgCapa) {
+  const livroElement = document.createElement("div");
+  livroElement.classList.add(
+    "livro",
+    "col-md-4",
+    "text-center",
+    "border-bottom",
+    "p-2"
+  );
+
+  const titulo = document.createElement("p");
+  titulo.textContent = livro.volumeInfo.title;
+  titulo.classList.add("text-light", "titulo-livro");
+
+  const img = document.createElement("img");
+  img.src = imgCapa;
+  img.classList.add("capa-livro");
+
+  const botao = document.createElement("button");
+  botao.textContent = "Ver mais";
+  botao.classList.add("btn", "btn-primary", "btn-sm", "mt-3");
+  botao.addEventListener("click", () =>
+    mostrarDetalhes(livro.volumeInfo, imgCapa)
+  );
+
+  livroElement.appendChild(titulo);
+  livroElement.appendChild(img);
+  livroElement.appendChild(document.createElement("br"));
+  livroElement.appendChild(botao);
+
+  return livroElement;
 }
 
 function mostrarDetalhes(volumeInfo, imgCapa) {
@@ -139,17 +158,44 @@ function mostrarDetalhes(volumeInfo, imgCapa) {
   document.body.style.overflow = "hidden";
 }
 
-window.onscroll = function () {
-  if (
-    window.innerHeight + window.scrollY >= document.body.offsetHeight - 100 &&
-    !loading
-  ) {
-    loading = true;
-    carregarLivros(startIndex, lastQuery);
-    startIndex += 40;
-    loading = false;
-  }
-};
+function mostrarCarregando() {
+  document.getElementById("loading").classList.remove("d-none");
+}
+
+function esconderCarregando() {
+  document.getElementById("loading").classList.add("d-none");
+}
+
+function atualizarLista() {
+  document.getElementById("livros").innerHTML = "";
+
+  const startIndex = (currentPage - 1) * pageSize;
+  carregarLivros(startIndex, lastQuery);
+}
+
+document
+  .getElementById("pagina-anterior")
+  .addEventListener("click", function (e) {
+    e.preventDefault();
+    if (currentPage > 1) {
+      currentPage--;
+      document.getElementById("pagina-atual").textContent = currentPage;
+
+      atualizarLista();
+    }
+  });
+
+document
+  .getElementById("pagina-seguinte")
+  .addEventListener("click", function (e) {
+    e.preventDefault();
+    if (currentPage < totalPages) {
+      currentPage++;
+      document.getElementById("pagina-atual").textContent = currentPage;
+
+      atualizarLista();
+    }
+  });
 
 window.onload = function () {
   document

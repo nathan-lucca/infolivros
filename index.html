@@ -34,6 +34,21 @@
         <div id="livros" class="row"></div>
     </div>
 
+    <div id="loading" class="d-none text-center">
+        <p class="loading-text">Carregando...</p>
+    </div>
+
+    <div class="d-flex justify-content-center mt-3">
+        <nav aria-label="Page navigation example">
+            <ul class="pagination">
+                <li class="page-item"><a class="page-link" href="#" id="pagina-anterior">Anterior</a></li>
+                <li class="page-item"><a class="page-link" href="#" id="pagina-atual">1</a></li>
+                <li class="page-item"><span class="page-link">de <span id="total-paginas">...</span></span></li>
+                <li class="page-item"><a class="page-link" href="#" id="pagina-seguinte">Próxima</a></li>
+            </ul>
+        </nav>
+    </div>
+
     <div class="zoomed">
         <div class="zoomed-content">
             <img src="" alt="Livro Ampliado">

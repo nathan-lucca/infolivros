@@ -1,5 +1,11 @@
 body {
   background-color: #f9f5e1;
+  overflow: auto;
+  scrollbar-width: none; /* Para o Firefox */
+}
+
+::-webkit-scrollbar {
+  display: none; /* Para o Chrome e Safari */
 }
 
 a {
